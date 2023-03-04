@@ -20,7 +20,7 @@ let fourth = (x) => { /*esempio di arrow function*/
     return square(x) * square(x); //lasciando solo return mette ; da solo il codice
 }
 
-let n = fourth(4);
+let n = fourth(5);
 
 console.log(n);
 
