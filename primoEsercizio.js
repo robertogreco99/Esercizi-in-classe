@@ -20,14 +20,26 @@ book2.pages=10;
     fai qualcosa
 }*/ 
 
-const raddoppia = (x) =>
+/*const raddoppia = (x) =>
 {
     return x=x+x;
 }
 let y = raddoppia(5);
 console.log(y);
+*/
+function counter() {
+    let value =0;
 
+    const getNext = () => {
+        value++;
+        return value;
+    }
+    return getNext ;
+}
 
-
+const count1= counter();
+console.log(count1());
+console.log(count1());
+console.log(count1());
 
 
