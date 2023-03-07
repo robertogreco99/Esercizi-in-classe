@@ -57,10 +57,19 @@ function Question(text, questioner, date) {
     }
 
     this.listbyDate = () => { 
-        return [...this.list].sort((a, b) => a.date.isAfter(b.date));
+        return [...this.list].sort((a, b) => -a.date.diff(b.date));
     }
 
     this.afterDate = (date) => this.list.filter((e) => e.date.isAfter(date));
+
+    this.avgScore = () =>  {
+        const votes = this.list.map((e)=> e.score);
+        return votes.reduce((acc,val,i,arr) => acc+val/arr.length, 0 );
+        /*let sum =0;
+        for (let val of votes )
+            sum+=val;
+        return sum/votes.length;*/
+    }
 
 }
 //creo un Answer e una question
@@ -83,6 +92,9 @@ q.listbyScore().forEach(x => console.log(x.str()));
 console.log("--------------------------------------");
 q.afterDate(dayjs("2023-03-03")).forEach(x => console.log(x.str()));
 console.log("--------------------------------------");
+q.listbyDate().forEach(x => console.log(x.str()));
+console.log("--------------------------------------");
+console.log(q.avgScore());
 
 
 
