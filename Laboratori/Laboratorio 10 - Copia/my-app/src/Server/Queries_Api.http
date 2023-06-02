@@ -1,0 +1,64 @@
+GET http://localhost:3001/api/films HTTP/1.1
+###
+GET http://localhost:3001/api/films/4 HTTP/1.1
+###
+POST http://localhost:3001/api/films
+Content-Type: application/json
+
+{
+    "title": "a silent voice",
+    "favorite": 0,
+    "watchDate": "2023-05-11",
+    "rating":0,
+    "user": 1
+}
+###
+PUT http://localhost:3001/api/films/1
+Content-Type: application/json  
+
+{
+    "id" :1,
+    "title": "Your Name",
+    "favorite": 1,
+    "watchDate": "2023-05-11",
+    "rating": 5,
+    "user": 1    
+}
+
+###
+DELETE http://localhost:3001/api/films/4 HTTP/1.1
+###
+PUT http://localhost:3001/api/films/1/favorite HTTP/1.1
+###
+PUT http://localhost:3001/api/films/5/favorite HTTP/1.1
+###
+PUT http://localhost:3001/api/films/1/rating
+Content-Type: application/json  
+
+{
+    "rating": 3  
+}
+###
+PUT http://localhost:3001/api/films/2/rating
+Content-Type: application/json  
+
+{
+    "rating": 0
+}
+###
+PUT http://localhost:3001/api/films/1/favorite
+###
+###
+PUT http://localhost:3001/api/films/2/favorite
+###
+GET http://localhost:3001/api/films/filter/all HTTP/1.1
+###
+GET http://localhost:3001/api/films/filter/bestrated HTTP/1.1
+###
+GET http://localhost:3001/api/films/filter/unseen HTTP/1.1
+###
+GET http://localhost:3001/api/films/filter/Favorites HTTP/1.1
+###
+GET http://localhost:3001/api/films/filter/seenlastmonth HTTP/1.1
+###
+GET http://localhost:3001/api/films/filter/errata HTTP/1.1
