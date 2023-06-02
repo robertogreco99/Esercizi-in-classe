@@ -45,6 +45,7 @@ function addFilm(film) {
   return new Promise((resolve, reject) => {
     fetch(URL+'/films', {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -78,6 +79,7 @@ function editFilm(film) {
   return new Promise((resolve, reject) => {
     fetch(URL+`/films/${film.id}`, {
       method: 'PUT',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -108,6 +110,7 @@ function deleteFilm(id) {
   return new Promise((resolve, reject) => {
     fetch(URL+`/films/${id}`, {
       method: 'DELETE',
+      credentials: 'include',
     }).then((response) => {
       if (response.ok) {
         resolve(null);
@@ -145,6 +148,47 @@ function updateFavorite(film) {
   });
 }
 
+async function logIn(credentials) {
+  let response = await fetch(URL + '/sessions', {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(credentials),
+  });
+  if (response.ok) {
+    const user = await response.json();
+    return user;
+  } else {
+    const errDetail = await response.json();
+    throw errDetail.message;
+  }
+}
 
-const API = {getAllFilms,getAllFilmsByFilter,addFilm,editFilm,deleteFilm,updateFavorite};
+async function logOut() {
+  await fetch(URL+'/sessions/current', {
+    method: 'DELETE', 
+    credentials: 'include' 
+  });
+}
+
+async function getUserInfo() {
+  const response = await fetch(URL+'/sessions/current', {
+    credentials: 'include'
+  });
+  const userInfo = await response.json();
+  if (response.ok) {
+    return userInfo;
+  } else {
+    throw userInfo;  // an object with the error coming from the server
+  }
+}
+
+
+
+
+
+const API = {getAllFilms,getAllFilmsByFilter,addFilm,editFilm,deleteFilm,updateFavorite,
+  logIn, logOut, getUserInfo};
 export default API;
