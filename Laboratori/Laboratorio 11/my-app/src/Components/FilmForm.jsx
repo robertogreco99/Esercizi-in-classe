@@ -14,6 +14,7 @@ function FilmForm(props) {
     props.mode==='edit'  && props.initialValue.date !='' ? props.initialValue.date/*.format('YYYY-MM-DD')*/:
    '') ;
   const [rating, setRating] = useState(props.mode ==='edit' && props.initialValue.rating != undefined ? props.initialValue.rating :'');
+  const [user, setUser] = useState(props.mode ==='edit' && props.initialValue.user!= undefined ? props.initialValue.user :'');
   const [errorMsg, setErrorMsg] = useState('');
  
 
@@ -25,6 +26,7 @@ function FilmForm(props) {
       watchdate: dayjs(date),
       favorite: favorite,
       rating: rating,
+      user : user, 
     }
     console.log("data" + e.date);
     if(title==''){
@@ -54,6 +56,7 @@ function FilmForm(props) {
         watchdate: dayjs(date),
         favorite: favorite,
         rating: rating,
+        user : user, 
       }
         //props.handleSave(props.initialValue.id, title, favorite,date,rating);
         //props.EditList(id,title,favorite,date,rating);

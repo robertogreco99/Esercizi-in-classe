@@ -17,6 +17,7 @@ import { useLocation } from 'react-router-dom';
 function MyRow(props) {
   const navigate = useNavigate();
   const { e } = props;
+ 
   let statusClass = null;
   
 
@@ -64,7 +65,6 @@ function MyRow(props) {
 
   //<td> <Form.Check type="checkbox" label="Favorite"  checked={e.favorites == true ? true : false} onChange={cambiocolore}/> </td>
  
-
   return (
     //<tr>
     <tr className={statusClass}> 
@@ -77,15 +77,16 @@ function MyRow(props) {
           checked={e.favorite === true ? true : false }
           onChange={()=>{props.handleChangeFavorite(e)}}
         />
-</td>
+    </td>
      
       <td>{e.date && e.date.isValid() ? e.date.format('YYYY-MM-DD') : ''}</td> 
       <td> {e.rating !== undefined ? Stelle(e.rating) : Stelle(0)} </td>
       <td> 
-        <Button variant="danger" mode={props.mode} className='mx-2' onClick={()=>{props.handlechangemodeedit(e.id)}}> <i className="bi bi-pencil"></i> </Button> 
-        <Button variant="success" mode={props.mode} className='mx-2' onClick={()=>{props.handleDeleteFilm(e.id)}}> <i className="bi bi-trash"></i> </Button>
+        <Button variant="danger" mode={props.mode} className='mx-2' disabled={e.user !== props.userId}  onClick={()=>{props.handlechangemodeedit(e.id)}}> <i className="bi bi-pencil"></i> </Button> 
+        <Button variant="success" mode={props.mode} className='mx-2' disabled={e.user !== props.userId} onClick={()=>{props.handleDeleteFilm(e.id)}}> <i className="bi bi-trash"></i> </Button>
       </td>
-      
+      <td>{e.user ? e.user :  'undefined'}</td>
+
     </tr>
   );
 }
@@ -187,31 +188,35 @@ function MyTable(props) {
             <th>Title</th>
             <th>Favorite</th>
             <th>WatchDate</th>
-            <th>Rating</th>
+            <th>Rating</th>           
             <th>Edit</th>
+            <th>User</th>
+            
           </tr>
         </thead>
         <tbody>
           {props.listofFilm.map((e, i) =>
-            <MyRow e={e} key={i} mode={props.mode} setMode={props.setMode} /*listofFilm={props.listofFilm}*/handleChangeFavorite={handleChangeFavorite} handlechangemodeedit={handlechangemodeedit} handleDeleteFilm={handleDeleteFilm} />)
+            <MyRow e={e} userId={props.user && props.user.id} key={i} mode={props.mode} setMode={props.setMode} /*listofFilm={props.listofFilm}*/handleChangeFavorite={handleChangeFavorite} handlechangemodeedit={handlechangemodeedit} handleDeleteFilm={handleDeleteFilm} />)
           }
         </tbody>
       </Table>
       <div>     
-           <Link to='/add'>
-           <Button >+</Button>
-          </Link>
+      <Button variant='success' onClick={()=>navigate('/add')} disabled={props.user?.id? false : true}>+</Button>
+           
          </div>
     </>
   )
 }
 
+/*<Link to='/add'>
+           <Button disabled={props.user?.id? false : true}  >+ </Button>
+          </Link>*/
 
 function MainComponent(props) {
 
   return (<>
     <Row>
-      <MyTable listofFilm={props.filmlist} filtro={props.filtro} mode={props.mode} setMode={props.setMode} editedAnswer={props.editedAnswer} 
+      <MyTable listofFilm={props.filmlist} user={props.user} filtro={props.filtro} mode={props.mode} setMode={props.setMode} editedAnswer={props.editedAnswer} 
       setEditedAnswer={props.setEditedAnswer} deleteFilm={props.deleteFilm} updateFilmFavorite={props.updateFilmFavorite} />
     </Row>
   </>

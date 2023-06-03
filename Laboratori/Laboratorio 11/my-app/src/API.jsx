@@ -12,7 +12,7 @@ async function getAllFilms() {
   const filmlist = await response.json();
   if (response.ok) {
     //console.log (filmlist.map((e) => ({id: e.id, title:e.title, favorites: e.favorite === 1 ? true : false, date: dayjs(e.date),rating : e.rating})));
-    return filmlist.map((e) => ({id: e.id, title:e.title, favorite: e.favorite === 1 ? true : false, date: dayjs(e.date) ,rating : e.rating}) )
+    return filmlist.map((e) => ({id: e.id, title:e.title, favorite: e.favorite === 1 ? true : false, date: dayjs(e.date) ,rating : e.rating,user : e.user}) )
   } else {
     throw film;  // mi aspetto che sia un oggetto json fornito dal server che contiene l'errore
   }
@@ -31,7 +31,8 @@ async function getAllFilmsByFilter(idfilter) {
       title: e.title,
       favorite: e.favorite === 1 ? true : false,
       date: dayjs(e.date) ,
-      rating: e.rating
+      rating: e.rating,
+      user : e.user
     }));
   } catch (error) {
     console.log(error); // Stampa l'errore nella console per il debug
@@ -56,7 +57,7 @@ function addFilm(film) {
       favorite: film.favorite ? 1 : 0,
       watchdate: film.watchdate.format('YYYY-MM-DD'),
       rating: film.rating,
-      user: 1
+      user: film.user
     })
     
     }).then((response) => {
@@ -89,7 +90,7 @@ function editFilm(film) {
         favorite: film.favorite ? 1 : 0,
         watchdate: film.watchdate.format('YYYY-MM-DD'),
         rating: film.rating,
-        user: 1
+        user: film.user
       })
     }).then((response) => {
       if (response.ok) {
@@ -129,6 +130,7 @@ function updateFavorite(film) {
   return new Promise((resolve, reject) => {
     fetch(URL+`/films/${film.id}/favorite`, {
       method: 'PUT',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -159,8 +161,10 @@ async function logIn(credentials) {
   });
   if (response.ok) {
     const user = await response.json();
+    console.log("log avvenuto con sucesso , lui è l'user",user);
     return user;
   } else {
+    console.log("fallita fetch")
     const errDetail = await response.json();
     throw errDetail.message;
   }
@@ -189,6 +193,7 @@ async function getUserInfo() {
 
 
 
-const API = {getAllFilms,getAllFilmsByFilter,addFilm,editFilm,deleteFilm,updateFavorite,
-  logIn, logOut, getUserInfo};
+
+
+const API = {getAllFilms,getAllFilmsByFilter,addFilm,editFilm,deleteFilm,updateFavorite,logIn, logOut, getUserInfo};
 export default API;

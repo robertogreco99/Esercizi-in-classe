@@ -8,8 +8,6 @@ const dayjs = require('dayjs');
 const db = new sqlite.Database('films.db', (err) => {
   if (err) throw err;
 });
-
-// get all films
 exports.listFilms = () => {
   return new Promise((resolve, reject) => {
     const sql = 'SELECT * FROM films';
@@ -18,11 +16,38 @@ exports.listFilms = () => {
         reject(err);
         return;
       }
-      const films = rows.map((e) => ({ id: e.id, title: e.title, favorite: e.favorite, date: e.watchdate, rating: e.rating, user: e.user }));
+      
+      const films = rows.map((row) => {
+        return {
+          id: row.id,
+          title: row.title,
+          favorite: row.favorite,
+          watchdate: row.watchdate,
+          rating: row.rating,
+          user: row.user,
+        };
+      });
+      
       resolve(films);
     });
   });
 };
+
+// get all films
+/*exports.listFilms = () => {
+  return new Promise((resolve, reject) => {
+    const sql = 'SELECT * FROM films';
+    db.all(sql, [], (err, rows) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      const films = rows.map((e) => ({ id: e.id, title: e.title, favorite: e.favorite, date: e.watchdate, rating: e.rating, user: e.user }));
+     
+      resolve(films);
+    });
+  });
+};*/
 
 
 // filtered films
@@ -103,11 +128,11 @@ exports.createFilm = (film) => {
 
 
 // update an existing movie
-exports.updateFilm = (film) => {
+exports.updateFilm = (film,userId) => {
   console.log('updateFilm: ' + JSON.stringify(film));
   return new Promise((resolve, reject) => {
-    const sql = 'UPDATE films SET title=?, favorite=?, watchdate=DATE(?) , rating=?, user=? WHERE id = ?';
-    db.run(sql, [film.title, film.favorite, film.watchdate, film.rating, film.user, film.id], function (err) {
+    const sql = 'UPDATE films SET title=?, favorite=?, watchdate=DATE(?) , rating=?, user=? WHERE id = ?  AND user = ?';
+    db.run(sql, [film.title, film.favorite, film.watchdate, film.rating, film.user, film.id,userId], function (err) {
       if (err) {
         reject(err);
         return;
@@ -118,11 +143,11 @@ exports.updateFilm = (film) => {
 };
 
 // update an existing movie rating
-exports.updateRating = (film, rating) => {
+exports.updateRating = (film, rating,userId) => {
   console.log('updateFilm: ' + JSON.stringify(film));
   return new Promise((resolve, reject) => {
-    const sql = 'UPDATE films SET rating=? WHERE id = ?';
-    db.run(sql, [rating, film.id], function (err) {
+    const sql = 'UPDATE films SET rating=? WHERE id = ?  AND user = ?';
+    db.run(sql, [rating, film.id,userId], function (err) {
       if (err) {
         reject(err);
         return;
@@ -133,11 +158,11 @@ exports.updateRating = (film, rating) => {
 };
 
 //Mark an existing film as favorite/unfavorite4
-exports.updateFavorite = (film, value) => {
+exports.updateFavorite = (film, value,userId) => {
   console.log('updateFilm: ' + JSON.stringify(film));
   return new Promise((resolve, reject) => {
-    const sql = 'UPDATE films SET favorite=? WHERE id = ?';
-    db.run(sql, [value, film.id], function (err) {
+    const sql = 'UPDATE films SET favorite=? WHERE id = ? AND user = ?';
+    db.run(sql, [value, film.id,userId], function (err) {
       if (err) {
         reject(err);
         return;
@@ -154,10 +179,10 @@ exports.updateFavorite = (film, value) => {
 
 
 // delete an existing answer
-exports.deleteFilm = (id) => {
+exports.deleteFilm = (id,userId) => {
   return new Promise((resolve, reject) => {
-    const sql = 'DELETE FROM films WHERE id = ?';
-    db.run(sql, [id], function (err) {
+    const sql = 'DELETE FROM films WHERE id = ? AND user = ?';
+    db.run(sql, [id,userId], function (err) {
       if (err) {
         reject(err);
         return;

@@ -6,10 +6,11 @@ const {check, validationResult} = require('express-validator'); // validation mi
 const dao = require('./dao'); // module for accessing the DB
 const passport = require('passport'); // auth middleware
 const LocalStrategy = require('passport-local').Strategy; // username and password for login
-const { OPEN_READWRITE } = require('sqlite3');
 const session = require('express-session'); // enable sessions
 const userDao = require('./user-dao'); // module for accessing the user info in the DB
+
 const cors = require('cors');
+
 
 
 /*** Set up Passport ***/
@@ -24,9 +25,9 @@ passport.use(new LocalStrategy(
       return done(null, user);
     })
   }
-));
+  ));
 
-// serialize and de-serialize the user (user object <-> session)
+  // serialize and de-serialize the user (user object <-> session)
 // we serialize the user id and we store it in the session: the session is very small in this way
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -42,6 +43,7 @@ passport.deserializeUser((id, done) => {
     });
 });
 
+
 // init express
 const app = express();
 const port = 3001;
@@ -49,12 +51,12 @@ const port = 3001;
 // set-up the middlewares
 app.use(morgan('dev'));
 app.use(express.json());
+
 const corsOptions = {
   origin: 'http://localhost:5173',
   credentials: true,
 };
-app.use(cors(corsOptions)); // NB: Usare solo per sviluppo e per l'esame! Altrimenti indicare dominio e porta corretti
-
+app.use(cors(corsOptions));
 
 // custom middleware: check if a given request is coming from an authenticated user
 const isLoggedIn = (req, res, next) => {
@@ -75,8 +77,6 @@ app.use(session({
 // then, init passport
 app.use(passport.initialize());
 app.use(passport.session());
-
-
 /**********************API*************************************/
 
 //lista di tutti i film:
@@ -142,7 +142,7 @@ app.post('/api/films',isLoggedIn, [
         favorite: req.body.favorite,
         watchdate: req.body.watchdate,
         rating: req.body.rating,
-        user: req.body.user,
+        user: req.user.id/*req.body.user*/,
       };
       console.log ("il film è : "+ film);
       console.log("id:"+ film.id, "title"+film.title,
@@ -184,7 +184,7 @@ app.put('/api/films/:id', isLoggedIn , [
     console.log("film da modificare : "+film.id);
   
     try {
-      const numRowChanges = await dao.updateFilm(film);
+      const numRowChanges = await dao.updateFilm(film,req.user.id);
       res.json(numRowChanges);
       //res.status(200).end();
     } catch(err) {
@@ -219,7 +219,7 @@ app.put('/api/films/:id/rating', isLoggedIn, [
     console.log("title "+film.title);
   
     try {
-      const numRowChanges = await dao.updateRating(film,rating);
+      const numRowChanges = await dao.updateRating(film,rating,req.user.id);
       res.json(numRowChanges);
       //res.status(200).end();
     } catch(err) {
@@ -251,7 +251,7 @@ app.put('/api/films/:id/favorite', isLoggedIn,[
     console.log("favorite : "+ value);
   
     try {
-      const numRowChanges = await dao.updateFavorite(film,value);
+      const numRowChanges = await dao.updateFavorite(film,value,req.user.id);
       res.json(numRowChanges);
       //res.status(200).end();
     } catch(err) {
@@ -268,7 +268,7 @@ app.put('/api/films/:id/favorite', isLoggedIn,[
 // DELETE /api/films/<id>
 app.delete('/api/films/:id', isLoggedIn, async (req, res) => {
     try {
-      const numRowChanges = await dao.deleteFilm(req.params.id);  
+      const numRowChanges = await dao.deleteFilm(req.params.id,req.user.id);  
       // number of changed rows is sent to client as an indicator of success
       res.json(numRowChanges);
     } catch(err) {
@@ -276,6 +276,7 @@ app.delete('/api/films/:id', isLoggedIn, async (req, res) => {
       res.status(503).json({ error: `Database error during the deletion of answer ${req.params.id}.`});
     }
   });
+
 
 /*** Users APIs ***/
 
@@ -324,11 +325,12 @@ app.get('/api/sessions/current', (req, res) => {  if(req.isAuthenticated()) {
     res.status(401).json({error: 'Unauthenticated user!'});;
 });
 
-
 /*** Other express-related instructions ***/
 
 
-  // Activate the server
+
+// Activate the server
 app.listen(port, () => {
-    console.log(`film server listening at http://localhost:${port}`);
-  });
+  console.log(`film server listening at http://localhost:${port}`);
+});
+

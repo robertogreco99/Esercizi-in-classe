@@ -1,12 +1,13 @@
 'use strict';
 import dayjs from 'dayjs';
 
-function film(id, title, favorite, date,rating) {
+function film(id, title, favorite, date,rating,user) {
     this.id=id;
     this.title=title;
     this.favorite=favorite;
     this.date=date && dayjs(date);
     this.rating=rating;
+    this.user=user
 };
 /*const filmlist = [  
     new film(1, "TheEndofEvangelion", true, "2023-04-10", 5),
