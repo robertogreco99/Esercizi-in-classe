@@ -10,8 +10,8 @@ function FilmForm(props) {
         props.mode==='edit' ? props.initialValue.id : '') ;
   const [title, setTitle] = useState(props.mode ==='edit'? props.initialValue.title :'') ;
   const [favorite, setfavorite] = useState(props.mode === 'edit'? props.initialValue.favorite :'');
-  const [date, setDate] = useState(
-    props.mode==='edit'  && props.initialValue.date !='' ? props.initialValue.date/*.format('YYYY-MM-DD')*/:
+  const [watchdate, setWatchdate] = useState(
+    props.mode==='edit'  && props.initialValue.watchdate !='' ? props.initialValue.watchdate/*.format('YYYY-MM-DD')*/:
    '') ;
   const [rating, setRating] = useState(props.mode ==='edit' && props.initialValue.rating != undefined ? props.initialValue.rating :'');
   const [user, setUser] = useState(props.mode ==='edit' && props.initialValue.user!= undefined ? props.initialValue.user :'');
@@ -23,12 +23,12 @@ function FilmForm(props) {
     const e = {
       id: 0,
       title: title,
-      watchdate: dayjs(date),
+      watchdate: dayjs(watchdate),
       favorite: favorite,
       rating: rating,
       user : user, 
     }
-    console.log("data" + e.date);
+    console.log("data" + e.watchdate);
     if(title==''){
     setErrorMsg('Titolo non valido');
     }
@@ -53,7 +53,7 @@ function FilmForm(props) {
       const e = {
         id: id,
         title: title,
-        watchdate: dayjs(date),
+        watchdate: dayjs(watchdate),
         favorite: favorite,
         rating: rating,
         user : user, 
@@ -85,7 +85,7 @@ function FilmForm(props) {
   }
   function handleDate(event) {
     const v = event.target.value;
-    setDate(v); 
+    setWatchdate(v); 
   }
   function handleRating(event) {
     const v = event.target.value;
@@ -108,7 +108,7 @@ function FilmForm(props) {
 
             <Form.Group>
                 <Form.Label>Date</Form.Label>
-                <Form.Control type="date" name="date" value={date} onChange={handleDate} />
+                <Form.Control type="date" name="date" value={watchdate} onChange={handleDate} />
             </Form.Group>
 
             <Form.Group>

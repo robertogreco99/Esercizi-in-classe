@@ -6,22 +6,24 @@ import dayjs from "dayjs";
 
 const URL = 'http://localhost:3001/api';
 
-async function getAllFilms() {
+async function getAllFilms(user) {
   // call  /api/questions
-  const response = await fetch(URL+'/films');
+  //const response = await fetch(URL+'/films');
+  const response = await fetch(`${URL}/films?user=${user.id}`);
   const filmlist = await response.json();
   if (response.ok) {
     //console.log (filmlist.map((e) => ({id: e.id, title:e.title, favorites: e.favorite === 1 ? true : false, date: dayjs(e.date),rating : e.rating})));
-    return filmlist.map((e) => ({id: e.id, title:e.title, favorite: e.favorite === 1 ? true : false, date: dayjs(e.date) ,rating : e.rating,user : e.user}) )
+    return filmlist.map((e) => ({id: e.id, title:e.title, favorite: e.favorite === 1 ? true : false, watchdate: dayjs(e.watchdate) ,rating : e.rating,user : e.user}) )
   } else {
-    throw film;  // mi aspetto che sia un oggetto json fornito dal server che contiene l'errore
+    throw new Error('Si è verificato un errore durante il recupero dei film.');
   }
 }
 
-async function getAllFilmsByFilter(idfilter) {
+async function getAllFilmsByFilter(idfilter,user) {
   try {
     
-    const response = await fetch(URL+'/films/filter/'+idfilter);
+    //const response = await fetch(URL+'/films/filter/'+idfilter);
+    const response = await fetch(`${URL}/films/filter/${idfilter}?user=${user.id}`);
     if (!response.ok) {
       throw new Error('Errore nella richiesta al server');
     }
@@ -30,7 +32,7 @@ async function getAllFilmsByFilter(idfilter) {
       id: e.id,
       title: e.title,
       favorite: e.favorite === 1 ? true : false,
-      date: dayjs(e.date) ,
+      watchdate: dayjs(e.watchdate) ,
       rating: e.rating,
       user : e.user
     }));

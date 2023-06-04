@@ -79,7 +79,7 @@ function MyRow(props) {
         />
     </td>
      
-      <td>{e.date && e.date.isValid() ? e.date.format('YYYY-MM-DD') : ''}</td> 
+      <td>{e.watchdate && e.watchdate.isValid() ? e.watchdate.format('YYYY-MM-DD') : ''}</td> 
       <td> {e.rating !== undefined ? Stelle(e.rating) : Stelle(0)} </td>
       <td> 
         <Button variant="danger" mode={props.mode} className='mx-2' disabled={e.user !== props.userId}  onClick={()=>{props.handlechangemodeedit(e.id)}}> <i className="bi bi-pencil"></i> </Button> 
@@ -110,7 +110,7 @@ function MyTable(props) {
   }
 
   function handlechangemodeedit(id) {
-    props.setMode('edit');
+    //props.setMode('edit');
     console.log('edit');
     console.log(' id '+id);
     console.log(props.listofFilm.filter((a) => (a.id === id))[0]) ;
@@ -133,16 +133,16 @@ function MyTable(props) {
     props.updateFilmFavorite(e);
     
   }
-  function handleAdd(title,favorite,date,rating){
+  function handleAdd(title,favorite,watchdate,rating){
     console.log('eseguito handleAdd');
-    props.addToList(title,favorite,date,rating);
+    props.addToList(title,favorite,watchdate,rating);
     props.setMode('view');
   }
 
 
   
-  function handleSave(id, title,favorite,date,rating) {
-    EditList(id,title,favorite,date,rating);
+  function handleSave(id, title,favorite,watchdate,rating) {
+    EditList(id,title,favorite,watchdate,rating);
     console.log('post cambio '+favorite);
     props.setMode('view');
 }

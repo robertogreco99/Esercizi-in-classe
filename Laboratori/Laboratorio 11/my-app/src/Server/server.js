@@ -82,7 +82,9 @@ app.use(passport.session());
 //lista di tutti i film:
 // GET /api/films
 app.get('/api/films', (req, res) => {
-    dao.listFilms()
+  const user = req.query.user; // Ottieni l'ID dell'utente dalla richiesta
+  dao.listFilms(user)
+    //dao.listFilms()
       .then(film => res.json(film))
       .catch(() => res.status(500).end());
   });
@@ -93,9 +95,10 @@ app.get('/api/films', (req, res) => {
 //lista di tutti i film con filtro:
 app.get('/api/films/filter/:idfilter', async (req, res) => {
   try {
+    const user = req.query.user;
     const idfilter=req.params.idfilter;
     console.log("filtro nella api "+ idfilter);
-    const result = await dao.listFilmsByFilter(idfilter);
+    const result = await dao.listFilmsByFilter(idfilter,user);
     if(result.error)
       res.status(404).json(result);
     else

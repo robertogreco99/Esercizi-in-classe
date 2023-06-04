@@ -27,13 +27,14 @@ function Loading(props) {
 }
 
 function Layout(props) {
+  //{props.initialLoading ? <Loading/> : <Outlet  /> } </Col>
   return (
   <div className='App'>
     <NavbarFunction  user={props.user} logout={props.logout}></NavbarFunction>
     <Row>
         <Col sm={4}> <SideBar setFiltro={props.setFiltro} filtro={props.filtro}   ></SideBar> </Col>
-        <Col sm={8}>  <MyHeader user={props.user} logout={props.logout} filtro={props.filtro}/> 
-        {props.initialLoading ? <Loading/> : <Outlet  /> } </Col>
+        <Col sm={8}>  <MyHeader user={props.user} logout={props.logout} filtro={props.filtro}/> <Outlet  />  </Col>
+        
       </Row>
   </div>
   );
@@ -56,9 +57,9 @@ function App() {
   const [mode, setMode] = useState('view');
   const [list, setList] = useState([]/*filmlist*/);
   const [editedAnswer,setEditedAnswer]=useState(false);
-  const [dirty,setDirty]=useState(true);
+  const [dirty,setDirty]=useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [initialLoading, setInitialLoading] = useState(true);
+  //const [initialLoading, setInitialLoading] = useState(true);
   const [user, setUser] = useState(undefined);
   const [loggedIn, setLoggedIn] = useState(false);
  
@@ -92,15 +93,55 @@ function App() {
     checkAuth();
   }, []);
 
-  useEffect( () => {
-    if (dirty) {
-    API.getAllFilms() 
-      .then((list) => {setList(list) ; setDirty(false);  setInitialLoading(false);})
+  /*useEffect( () => {
+    console.log("dirty : " +dirty + " user : "+user + " loggedIn: "+loggedIn)
+    if (dirty && loggedIn) {
+    API.getAllFilms(user) 
+      .then((list) => {setList(list) ; setDirty(false);  /*setInitialLoading(false);*/ /*})
       .catch((err) => console.log(err));
     }
-  }, [dirty]);
-
+  }, [dirty,loggedIn]);*/
+  
   useEffect(() => {
+    console.log("dirty : " + dirty + " user : " + user + " loggedIn: " + loggedIn);
+    if (dirty && loggedIn) {
+      const fetchData = async () => {
+        try {
+          const userInfo = await API.getUserInfo();
+          const list = await API.getAllFilms(userInfo);
+          console.log("user"+userInfo);
+          setList(list);
+          setDirty(false);
+          /*setInitialLoading(false);*/
+        } catch (err) {
+          console.log(err);
+        }
+      };
+      fetchData();
+    }
+  }, [dirty, loggedIn]);
+  
+  useEffect(() => {
+    console.log("dirty : " + dirty + " user : " + user + " loggedIn: " + loggedIn);
+    if (filtro !== '' && loggedIn) {
+      const fetchData = async () => {
+        try {
+          const userInfo = await API.getUserInfo();
+          const list = await API.getAllFilmsByFilter(filtro,userInfo);
+          console.log("user"+userInfo);
+          setList(list);
+          //setDirty(false);
+          /*setInitialLoading(false);*/
+        } catch (err) {
+          console.log(err);
+        }
+      };
+      fetchData();
+    }
+  }, [filtro, loggedIn]);
+  
+  
+ /* useEffect(() => {
     if (filtro !== '') {
       
       API.getAllFilmsByFilter(filtro)
@@ -108,13 +149,14 @@ function App() {
         .catch((err) => console.log(err));
 
     }
-  }, [filtro]);
+  }, [filtro]);*/
   
 
   const doLogOut = async () => {
     await API.logOut();
     setLoggedIn(false);
     setUser(undefined);
+    setFiltro(''); 
     /* set state to empty if appropriate */
   }
   
@@ -122,7 +164,8 @@ function App() {
   const loginSuccessful = (user) => {
     setUser(user);
     setLoggedIn(true);
-    setDirty(true);  // load latest version of data, if appropriate
+    setDirty(true);
+    // load latest version of data, if appropriate
   }
   
 
@@ -207,13 +250,13 @@ return (
   <BrowserRouter>
   <div>
   <Routes>
-  <Route path="/" element={<Layout user={user} logout={doLogOut} filtro={filtro} setFiltro={setFiltro} filmlist={list}  initialLoading={initialLoading} />}>
-  <Route index element={<MainComponent mode={'view'} user={user} logout={doLogOut}  filmlist={list}  deleteFilm={deleteFilm} setMode= {setMode} filtro={filtro}editedAnswer={editedAnswer} setEditedAnswer={setEditedAnswer} 
-  updateFilmFavorite={updateFilmFavorite }/>} />
-  <Route path="add" element={<FilmForm  mode={'add'} addToList={addToList} setMode={setMode}/>} />
-  <Route path="edit" element={<FilmForm  mode={'edit'}  user={user} logout={doLogOut} setMode={setMode} EditList={EditList} initialValue={editedAnswer} setEditedAnswer={setEditedAnswer}/>} />
-  <Route path="filter/:filterLabel" element={ <MainComponent user={user} logout={doLogOut} filmlist={list} setFiltro={setFiltro} filtro={filtro}  deleteFilm={deleteFilm}  updateFilmFavorite={updateFilmFavorite }/> } />
-  <Route path='login' element={loggedIn? <Navigate replace to='/' />:  <LoginForm loginSuccessful={loginSuccessful} />} />
+  <Route path="/" element={<Layout user={user} logout={doLogOut} filtro={filtro} setFiltro={setFiltro} filmlist={list}  /*initialLoading={initialLoading}*/ />}>
+  <Route index element={loggedIn? <MainComponent mode={'view'} user={user} logout={doLogOut}  filmlist={list}  deleteFilm={deleteFilm} setMode= {setMode} filtro={filtro}editedAnswer={editedAnswer} setEditedAnswer={setEditedAnswer} 
+  updateFilmFavorite={updateFilmFavorite }/> : <Navigate replace to='/login' />} />
+  <Route path="add" element={loggedIn?  <FilmForm  mode={'add'} addToList={addToList} setMode={setMode}/> : <Navigate replace to='/' /> } />
+  <Route path="edit" element={loggedIn?  <FilmForm  mode={'edit'}  user={user} logout={doLogOut} setMode={setMode} EditList={EditList} initialValue={editedAnswer} setEditedAnswer={setEditedAnswer}/> : <Navigate replace to='/' /> } />
+  <Route path="filter/:filterLabel" element={ loggedIn? <MainComponent user={user} logout={doLogOut} filmlist={list} setFiltro={setFiltro} filtro={filtro}  deleteFilm={deleteFilm}  updateFilmFavorite={updateFilmFavorite }/> : <Navigate replace to='/' /> } />
+  <Route path='login' element={loggedIn? <Navigate replace to='/' />:  <LoginForm loggedIn={loggedIn }loginSuccessful={loginSuccessful} />} />
   <Route path='/*' element={<DefaultRoute />} />
   </Route>
   </Routes>
